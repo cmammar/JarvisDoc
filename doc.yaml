@@ -62,6 +62,50 @@ paths:
         - write:pets
         - read:pets
       x-codegen-request-body-name: body
+  /auth/signin:
+    post:
+      tags:
+      - Auth
+      summary: Se connecter
+      operationId: signin
+      description: Renvoi un access token valable 15 minutes. Il est possible d'obtenir un refresh token afin de l'échanger contre un access token et ce, sans connexion de la part de l'utilisateur.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schemas:
+              schema:
+                type: object 
+                required:
+                - id
+                - nestedobj
+                properties:
+                  id:
+                    type: integer
+                    description: id of nested obj
+      responses:
+        200:
+          description: 'Succès'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicApiResponse'
+              examples:
+                success:
+                  value:
+                    code: 10
+                    message: User successfully added!
+        400:
+          description: 'Erreur'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicApiResponse'
+              examples:
+                error:
+                    value:
+                      code: 10
+                      message: Birthdate parameter is missing.
+      x-codegen-request-body-name: body
   /pet/{petId}/uploadImage:
     post:
       tags:

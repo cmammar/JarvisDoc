@@ -103,11 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
+                $ref: "#/components/schemas/BasicApiResponse"
               examples:
                 notActivated:
                   description: Compte non activé
@@ -119,7 +115,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NewUser"
+                $ref: "#/components/schemas/BasicApiResponse"
               examples:
                 notRegistered:
                   description: Utilisateur inexistant

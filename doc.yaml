@@ -2,263 +2,144 @@ openapi: 3.0.1
 info:
   title: Jarvis API
   description: Doc pour l'api Jarivs
-  termsOfService: http://swagger.io/terms/
   contact:
     email: dev@jarvis-app.fr
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
-externalDocs:
-  description: Find out more about Swagger
-  url: http://swagger.io
 servers:
-- url: https://jarvis-app.fr/v2
-- url: http://jarvis-app.fr/v2
+  - url: https://jarvis-app.fr/v2
+  - url: http://jarvis-app.fr/v2
 tags:
-- name: Auth
-  description: Tout ce qui est connexion, inscription...
-- name: User
-  description: Toutes les opérations et informations à propos de l'utilisateur
+  - name: Auth
+    description: Tout ce qui est connexion, inscription...
+  - name: User
+    description: Toutes les opérations et informations à propos de l'utilisateur
 paths:
   /auth/signup:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Créer un nouvel utilisateur
       operationId: createNewUser
+      description: Créer un nouvel utilisateur et envoie un mail de confirmation à l'adresse renseigné.
       requestBody:
         description: Les informations nécessaires pour créer un nouvelle utilisateur
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/NewUser'
+              $ref: "#/components/schemas/NewUser"
         required: true
       responses:
         200:
-          description: 'Succès'
+          description: "Succès"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicApiResponse'
+                $ref: "#/components/schemas/BasicApiResponse"
               examples:
                 success:
                   value:
                     code: 10
                     message: User successfully added!
         400:
-          description: 'Erreur'
+          description: "Erreur"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicApiResponse'
+                $ref: "#/components/schemas/BasicApiResponse"
               examples:
                 error:
-                    value:
-                      code: 10
-                      message: Birthdate parameter is missing.
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
+                  value:
+                    code: 10
+                    message: Birthdate parameter is missing.
       x-codegen-request-body-name: body
   /auth/signin:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Se connecter
       operationId: signin
       description: Renvoi un access token valable 15 minutes. Il est possible d'obtenir un refresh token afin de l'échanger contre un access token et ce, sans connexion de la part de l'utilisateur.
       requestBody:
+        description: Les informations nécessaires pour créer un nouvelle utilisateur
         content:
           application/x-www-form-urlencoded:
-            schemas:
-              schema:
-                type: object 
-                required:
-                - id
-                - nestedobj
-                properties:
-                  id:
-                    type: integer
-                    description: id of nested obj
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
       responses:
         200:
-          description: 'Succès'
+          description: "Succès"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicApiResponse'
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    accessToken:
+                      type: string
+                    expiresAt:
+                      type: integer
+                      description: date et heure de l'expiration au format epoch
               examples:
                 success:
                   value:
-                    code: 10
-                    message: User successfully added!
-        400:
-          description: 'Erreur'
+                    email: zangoDeDozo@kdoublea.fr
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1hbW1hci5jeXJpbEBlcGl0ZWNoLmV1IiwiaWF0IjoxNjAzNTgwMjQ2LCJleHAiOjE2MDM2NjY2NDZ9.O6lnbFG4Ff5vvPAWor3wI-TrGkB8mV4fbxPs9IdQ15Q
+                    expiresAt: 1603580333325
+        401:
+          description: "Erreur"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasicApiResponse'
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
               examples:
-                error:
-                    value:
-                      code: 10
-                      message: Birthdate parameter is missing.
+                notActivated:
+                  description: Compte non activé
+                  value:
+                    code: 0
+                    message: Your account is not activated.
+        400:
+          description: "Erreur"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewUser"
+              examples:
+                notRegistered:
+                  description: Utilisateur inexistant
+                  value:
+                    code: 0
+                    message: It doesn't match any of our credentials...
       x-codegen-request-body-name: body
-  /pet/{petId}/uploadImage:
-    post:
-      tags:
-      - pet
-      summary: uploads an image
-      operationId: uploadFile
-      parameters:
-      - name: petId
-        in: path
-        description: ID of pet to update
-        required: true
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              properties:
-                additionalMetadata:
-                  type: string
-                  description: Additional data to pass to server
-                file:
-                  type: string
-                  description: file to upload
-                  format: binary
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BasicApiResponse'
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
-  /store/inventory:
-    get:
-      tags:
-      - store
-      summary: Returns pet inventories by status
-      description: Returns a map of status codes to quantities
-      operationId: getInventory
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
-      security:
-      - api_key: []
-  /store/order:
-    post:
-      tags:
-      - store
-      summary: Place an order for a pet
-      operationId: placeOrder
-      requestBody:
-        description: order placed for purchasing the pet
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/Order'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        400:
-          description: Invalid Order
-          content: {}
-      x-codegen-request-body-name: body
-  /store/order/{orderId}:
-    get:
-      tags:
-      - store
-      summary: Find purchase order by ID
-      description: For valid response try integer IDs with value >= 1 and <= 10.         Other
-        values will generated exceptions
-      operationId: getOrderById
-      parameters:
-      - name: orderId
-        in: path
-        description: ID of pet that needs to be fetched
-        required: true
-        schema:
-          maximum: 10.0
-          minimum: 1.0
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Order not found
-          content: {}
-    delete:
-      tags:
-      - store
-      summary: Delete purchase order by ID
-      description: For valid response try integer IDs with positive integer value.         Negative
-        or non-integer values will generate API errors
-      operationId: deleteOrder
-      parameters:
-      - name: orderId
-        in: path
-        description: ID of the order that needs to be deleted
-        required: true
-        schema:
-          minimum: 1.0
-          type: integer
-          format: int64
-      responses:
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Order not found
-          content: {}
   /user:
     post:
       tags:
-      - user
+        - user
       summary: Create user
       description: This can only be done by the logged in user.
       operationId: createUser
       requestBody:
         description: Created user object
         content:
-          '*/*':
+          "*/*":
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
         required: true
       responses:
         default:
@@ -268,17 +149,17 @@ paths:
   /user/createWithArray:
     post:
       tags:
-      - user
+        - user
       summary: Creates list of users with given input array
       operationId: createUsersWithArrayInput
       requestBody:
         description: List of user object
         content:
-          '*/*':
+          "*/*":
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         required: true
       responses:
         default:
@@ -288,17 +169,17 @@ paths:
   /user/createWithList:
     post:
       tags:
-      - user
+        - user
       summary: Creates list of users with given input array
       operationId: createUsersWithListInput
       requestBody:
         description: List of user object
         content:
-          '*/*':
+          "*/*":
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         required: true
       responses:
         default:
@@ -308,22 +189,22 @@ paths:
   /user/login:
     get:
       tags:
-      - user
+        - user
       summary: Logs user into the system
       operationId: loginUser
       parameters:
-      - name: username
-        in: query
-        description: The user name for login
-        required: true
-        schema:
-          type: string
-      - name: password
-        in: query
-        description: The password for login in clear text
-        required: true
-        schema:
-          type: string
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -351,7 +232,7 @@ paths:
   /user/logout:
     get:
       tags:
-      - user
+        - user
       summary: Logs out current logged in user session
       operationId: logoutUser
       responses:
@@ -361,26 +242,26 @@ paths:
   /user/{username}:
     get:
       tags:
-      - user
+        - user
       summary: Get user by user name
       operationId: getUserByName
       parameters:
-      - name: username
-        in: path
-        description: 'The name that needs to be fetched. Use user1 for testing. '
-        required: true
-        schema:
-          type: string
+        - name: username
+          in: path
+          description: "The name that needs to be fetched. Use user1 for testing. "
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
           content:
             application/xml:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         400:
           description: Invalid username supplied
           content: {}
@@ -389,23 +270,23 @@ paths:
           content: {}
     put:
       tags:
-      - user
+        - user
       summary: Updated user
       description: This can only be done by the logged in user.
       operationId: updateUser
       parameters:
-      - name: username
-        in: path
-        description: name that need to be updated
-        required: true
-        schema:
-          type: string
+        - name: username
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Updated user object
         content:
-          '*/*':
+          "*/*":
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
         required: true
       responses:
         400:
@@ -417,17 +298,17 @@ paths:
       x-codegen-request-body-name: body
     delete:
       tags:
-      - user
+        - user
       summary: Delete user
       description: This can only be done by the logged in user.
       operationId: deleteUser
       parameters:
-      - name: username
-        in: path
-        description: The name that needs to be deleted
-        required: true
-        schema:
-          type: string
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
       responses:
         400:
           description: Invalid username supplied
@@ -456,9 +337,9 @@ components:
           type: string
           description: Order Status
           enum:
-          - placed
-          - approved
-          - delivered
+            - placed
+            - approved
+            - delivered
         complete:
           type: boolean
           default: false
@@ -500,14 +381,14 @@ components:
         name: User
     NewUser:
       required:
-      - birthdate
-      - email
-      - firstname
-      - lastname
-      - password
-      - secretQuestion
-      - secretQuestionAnswer
-      - type
+        - birthdate
+        - email
+        - firstname
+        - lastname
+        - password
+        - secretQuestion
+        - secretQuestionAnswer
+        - type
       type: object
       properties:
         email:
@@ -545,15 +426,7 @@ components:
         message:
           type: string
   securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: http://petstore.swagger.io/oauth/dialog
-          scopes:
-            write:pets: modify pets in your account
-            read:pets: read your pets
     api_key:
       type: apiKey
-      name: api_key
+      name: x-access-token
       in: header

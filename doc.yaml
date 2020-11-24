@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Jarvis
   contact: {}
-  version: '1.0.1'
+  version: '1.0'
 servers:
 - url: http://localhost:3000
   variables: {}

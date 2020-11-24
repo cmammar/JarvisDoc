@@ -20,6 +20,38 @@ paths:
           description: ''
           headers: {}
       deprecated: false
+  /auth/signup:
+    post:
+      tags:
+      - Misc
+      summary: Test2
+      description: This is another test.
+      operationId: Test2
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            encoding: {}
+            schema:
+              required:
+              - email
+              - password
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: required
+                  example: toto@to.to
+                password:
+                  type: string
+                  description: required
+                  example: azerty
+        required: false
+      responses:
+        200:
+          description: ''
+          headers: {}
+      deprecated: false
 tags:
 - name: Misc
   description: ''
